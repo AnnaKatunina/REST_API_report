@@ -1,0 +1,24 @@
+summary: "Returns a list of drivers"
+description: "Returns a list of drivers"
+operationId: "GetDrivers"
+produces:
+- "application/xml"
+- "application/json"
+parameters:
+  - name: "order"
+    in: "query"
+    enum:
+    - 'asc'
+    - 'desc'
+    required: false
+  - name: "format"
+    in: "query"
+    enum:
+    - 'json'
+    - 'xml'
+    required: true
+responses:
+  "200":
+    description: "successful operation"
+    schema:
+      type: "object"

@@ -13,7 +13,10 @@ class GetReport(Resource):
         format_param = request.args.get('format', type=str)
         order_param = request.args.get('order', type=str)
         report = []
-        for driver in Driver.select():
+        drivers = Driver.select()
+        if order_param == 'desc':
+            drivers = drivers.order_by(Driver.id.desc())
+        for driver in drivers:
             driver_dict = {
                 'number': driver.id,
                 'name': driver.name,
@@ -21,13 +24,11 @@ class GetReport(Resource):
                 'result': str(driver.result)[3:12]
             }
             report.append(driver_dict)
-        if order_param == 'desc':
-            report = report[::-1]
+        response = jsonify(report)
         if format_param == 'xml':
             xml_report = dicttoxml(report)
-            return Response(xml_report, content_type='text/xml')
-        else:
-            return jsonify(report)
+            response = Response(xml_report, content_type='text/xml')
+        return response
 
 
 class GetDriver(Resource):
@@ -36,21 +37,22 @@ class GetDriver(Resource):
     def get(self):
         format_param = request.args.get('format', type=str)
         order_param = request.args.get('order', type=str)
-        drivers = []
-        for driver in Driver.select().order_by(Driver.driver_id):
+        drivers_list = []
+        drivers = Driver.select().order_by(Driver.driver_id)
+        if order_param == 'desc':
+            drivers = drivers.order_by(Driver.driver_id.desc())
+        for driver in drivers:
             driver_dict = {
                 'driver_id': driver.driver_id,
                 'name': driver.name,
                 'team': driver.team
             }
-            drivers.append(driver_dict)
-        if order_param == 'desc':
-            drivers = drivers[::-1]
+            drivers_list.append(driver_dict)
+        response = jsonify(drivers_list)
         if format_param == 'xml':
-            xml_drivers = dicttoxml(drivers)
-            return Response(xml_drivers, content_type='text/xml')
-        else:
-            return jsonify(drivers)
+            xml_drivers = dicttoxml(drivers_list)
+            response = Response(xml_drivers, content_type='text/xml')
+        return response
 
 
 class GetDriverId(Resource):
